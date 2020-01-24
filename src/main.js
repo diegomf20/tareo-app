@@ -1,3 +1,7 @@
+window.$ = window.jQuery = require('jquery');
+window.Popper = require('popper.js').default;
+require('bootstrap');
+
 import Vue from 'vue'
 import App from './App.vue'
 
@@ -72,20 +76,27 @@ var routes =[
   {
     path: '/marcador',
     component: require('./view/marcador.vue').default,
+    beforeEnter: auth
   },
   {
     path: '/tareo',
     component: require('./view/tareo.vue').default,
+    beforeEnter: auth  
+  },
+  {
+    path: '/sincronizador',
+    component: require('./view/sincronizador.vue').default,
+    beforeEnter: auth  
   },
   {
     path: '/',
-    component: require('./view/marcador.vue').default,
-  }
-  // { 
-  //   path: '/marcador', 
-  //   component: require('./view/Operacion/marcador.vue').default,
-  //   beforeEnter: auth
-  // },
+    redirect: '/marcador'
+  },
+  { 
+    path: '/login', 
+    component: require('./view/login.vue').default,
+    // beforeEnter: auth
+  },
   // { 
   //   path: '/marcador2', 
   //   component: require('./view/Operacion/marcador2.vue').default,

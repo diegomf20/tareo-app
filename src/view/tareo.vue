@@ -6,7 +6,7 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">Lista de Pendientes</h5>
+                            <h5 class="modal-title">Lista de Pendientes ( {{ reporte.length }} )</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                             </button>
@@ -16,13 +16,13 @@
                                 <thead>
                                     <tr>
                                         <th>DNI</th>
-                                        <th>Nombre y Apellidos</th>
+                                        <!-- <th>Nombre y Apellidos</th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="item in reporte">
-                                        <td>{{ item.dni }}</td>
-                                        <td>{{ item.nom_operador }} {{ item.ape_operador }}</td>
+                                        <td>{{ item.codigo_operador }}</td>
+                                        <!-- <td>{{ item.nom_operador }} {{ item.ape_operador }}</td> -->
                                     </tr>
                                 </tbody>
                             </table>
@@ -79,6 +79,8 @@
     </div>
 </template>
 <script>
+import { mapState,mapMutations } from 'vuex'
+
 import Input from '../dragon-desing/dg-input.vue'
 import Select from '../dragon-desing/dg-select.vue'
 
@@ -111,12 +113,18 @@ export default {
         }
     },
     mounted() {
-        this.listarTurnos();
+        db.transaction((tx)=>{
+            // tx.executeSql('DROP TABLE IF EXISTS TAREO');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS TAREO (codigo_operador,proceso_id,labor_id,area_id,fecha,fundo_id,enviado)');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS AREA (id, nom_area)');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS LABOR (id, nom_labor,area_id)');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS PROCESO (id, nom_proceso,fundo_id)');
+        });
         this.listarProcesos();
         this.listarAreasLabor();
-        // this.listarFundoProceso();
     },
     computed: {
+        ...mapState(['cuenta']),
         labores(){
             for (let i = 0; i < this.areas.length; i++) {
                 const area = this.areas[i];
@@ -134,92 +142,88 @@ export default {
             return url_base+'/../storage/operador/'+foto;
         },
         listarAreasLabor(){
-            axios.get(url_base+'/area/labor')
-            .then(response => {
-                this.areas = response.data;
-            });
-        },
-        listarTurnos(){
-            axios.get(url_base+'/turno?all=true')
-            .then(response => {
-                this.turnos = response.data;
-                if (this.turnos.length>0) {
-                    this.tareo.turno_id=this.turnos[0].id;
-                }
-            });
-        },
-        listarLineas(){
-            axios.get(url_base+'/linea?all=true')
-            .then(response => {
-                this.lineas = response.data;
-                if (this.lineas.length>0) {
-                    this.tareo.linea_id=this.lineas[0].id;
-                }
-            });
+            var t=this;
+            db.transaction((tx)=>{
+                tx.executeSql('SELECT * FROM AREA', [], function (tx, results) {
+                    t.areas=[];
+                    for (let i = 0; i < results.rows.length; i++) {
+                        var area=results.rows.item(i);
+                        tx.executeSql('SELECT * FROM LABOR WHERE area_id="'+area.id+'" ORDER BY rowid DESC', [], function (tx, results2) {
+                            var labores=[];
+                            for (let j = 0; j < results2.rows.length; j++) {
+                                var labor = results2.rows.item(j);
+                                labores.push(labor);
+                            }
+                            area.labores=labores;
+                            t.areas.push(area);
+                        })
+                    }
+                }); 
+            },errorCB);
+            // axios.get(url_base+'/area/labor')
+            // .then(response => {
+            //     this.areas = response.data;
+            // });
         },
         listarProcesos(){
-            axios.get(url_base+'/proceso?all=true')
-            .then(response => {
-                this.procesos = response.data;
-            });
+            var t=this;
+            db.transaction((tx)=>{
+                tx.executeSql('SELECT * FROM PROCESO', [], function (tx, results) {
+                    t.procesos=[];
+                    for (let i = 0; i < results.rows.length; i++) {
+                        t.procesos.push(results.rows.item(i));
+                    }
+                }); 
+            },errorCB); 
         },
-        clearAlert(){
-            setTimeout(() => {
-                this.alert=null;
-            }, 1000);
-        },
+
         guardar(){
             this.$nextTick(() =>{
+                var t=this;
+
                 if (((null==this.tareo.codigo_barras) ? '' : this.tareo.codigo_barras ).length==8) {
-                    axios.post(url_base+'/tareo',this.tareo)
-                    .then(response => {
-                        var respuesta=response.data;
-                        console.log(respuesta);
-                        
-                        switch (respuesta.status) {
-                            case "ERROR":
-                                this.alert=respuesta;
-                                this.respuesta=null;
-                                this.clearAlert();
-                                break;
-                            case "WARNING":
-                                if((navigator.userAgent).search('Android')>-1){
-                                    swal("", respuesta.data, 'warning');
+                    db.transaction((tx)=>{
+                        if (t.tareo.codigo_barras!=null&&t.tareo.proceso_id!=null&&t.tareo.labor_id!=null&&t.tareo.area_id!=null) {
+                            tx.executeSql('INSERT INTO TAREO(codigo_operador,proceso_id,labor_id,area_id,fecha,fundo_id,enviado) VALUES (?,?,?,?,?,?,"NO")',
+                            [t.tareo.codigo_barras,t.tareo.proceso_id,t.tareo.labor_id,t.tareo.area_id,moment().format('YYYY-MM-DD'),t.cuenta.fundo_id],()=>{
+                                t.alert={
+                                    status: 'success',
+                                    data: 'Tareo Registrado.'
                                 }
-                                this.tareo.codigo_barras=null;
-                                this.alert={
-                                    status: 'warning',
-                                    data: respuesta.data
-                                };
-                                break;
-                            case "OK":
-                                // swal("", respuesta.data.nom_operador+" "+ respuesta.data.ape_operador, 'warning');
-                                this.alert={
-                                    status: 'primary',
-                                    data: "TAREO: "+respuesta.data.nom_operador+" "+ respuesta.data.ape_operador
-                                };
-                                // this.respuesta=response.data;
-                                this.tareo.codigo_barras=null;
-                                break;
-                            default:
-                                break;
+                            },errorCB);              
+                        }else{
+                            t.alert={
+                                status: 'danger',
+                                data: 'Campos Vacios.'
+                            }
+
                         }
-                    })
+                        this.tareo.codigo_barras=null;
+                    });
                 }else{
                     this.tareo.codigo_barras=null;
-                    this.respuesta={
-                        status: 'ERROR',
+                    this.alert={
+                        status: 'danger',
                         data: 'Código no Valido'
                     }
-                    this.clearAlert();
+                    // this.clearAlert();
                 }
             })
         },
         openPendientes(){
-            axios.get(url_base+'/reporte-pendientes?turno_id='+this.tareo.turno_id)
-            .then(response => {
-                this.reporte = response.data;
-            })
+            var t=this;
+            db.transaction((tx)=>{
+                tx.executeSql('SELECT M.codigo_operador FROM MARCADOR M LEFT JOIN (SELECT * FROM TAREO WHERE DATE(fecha)=?) T ON M.codigo_operador=T.codigo_operador WHERE T.codigo_operador is NUll AND DATE(M.ingreso)=? GROUP BY M.codigo_operador', [moment().format('YYYY-MM-DD'),moment().format('YYYY-MM-DD')], function (tx, results) {
+                    t.reporte=[];
+                    for (let i = 0; i < results.rows.length; i++) {
+                        t.reporte.push(results.rows.item(i));
+                    }
+                // this.reporte = response.data;
+                },errorCB); 
+            },errorCB); 
+            // axios.get(url_base+'/reporte-pendientes?turno_id='+this.tareo.turno_id)
+            // .then(response => {
+            // })
             $('#modal-pendientes').modal();
         }
     },

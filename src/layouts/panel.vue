@@ -1,12 +1,24 @@
 <template>
     <div id="app" :class="(statusSidebar) ? 'open':''">
         <div class="sidebar" v-if="cuenta!=null">
-            <administrador v-if="cuenta.rol=='ADMINISTRADOR'"></administrador>
-            <comun v-if="cuenta.rol=='COMUN'"></comun>            
+            <div class="sidebar-content">
+                <img src="/img/logo.png" alt="">
+            </div>
+            <hr>
+            <comun></comun>
+            <hr>
+            <div class="sidebar-content">
+                <button @click="cerrar()" class="btn btn-danger btn-sm btn-float-right">
+                    Salir <i class="fas fa-sign-out-alt"></i>
+                </button>            
+            </div>
         </div>
         <div class="background-sidebar" @click="close()"></div>
-        <nav class="navbar">
-            <button @click="open()" class="btn-link-success"><i class="material-icons">menu</i></button>
+        <nav class="navbar" v-if="cuenta!=null">
+            <a @click="open()">
+                <i class="fas fa-bars"></i>
+            </a>
+            <h5 >{{ cuenta.fundo_id }}</h5>
             
             <!-- <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
@@ -32,7 +44,6 @@
                     </li>
                 </ul>
             </div> -->
-            <button @click="cerrar()" class="btn btn-danger btn-sm btn-float-right">Salir</button>
         </nav>
         <div class="content">
             <slot/>

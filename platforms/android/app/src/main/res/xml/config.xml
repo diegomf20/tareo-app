@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="io.cordova.hellocordova" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="io.diegomf20.tareo" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <feature name="Whitelist">
         <param name="android-package" value="org.apache.cordova.whitelist.WhitelistPlugin" />
         <param name="onload" value="true" />
@@ -7,12 +7,12 @@
     <feature name="SQLitePlugin">
         <param name="android-package" value="io.sqlc.SQLitePlugin" />
     </feature>
-    <name>HelloCordova</name>
+    <name>AppTareo</name>
     <description>
-        A sample Apache Cordova application that responds to the deviceready event.
+        Aplicación para control de asistencia y tareo en campo.
     </description>
-    <author email="dev@cordova.apache.org" href="http://cordova.io">
-        Apache Cordova Team
+    <author email="diegomf.mendoza@gmail.com">
+        Diego MF Desarrollos
     </author>
     <content src="index.html" />
     <access origin="*" />
@@ -22,6 +22,13 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
+    <icon density="mdpi" height="57" src="src/icon.png" width="57" />
+    <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application" xmlns:android="http://schemas.android.com/apk/res/android">
+        <application android:networkSecurityConfig="@xml/network_security_config" />
+        <application android:usesCleartextTraffic="true" />
+    </edit-config>
+    <resource-file src="network_security_config.xml" target="app/src/main/res/xml/network_security_config.xml" />
     <allow-intent href="market:*" />
     <preference name="loglevel" value="DEBUG" />
+    <preference name="loadUrlTimeoutValue" value="700000" />
 </widget>
