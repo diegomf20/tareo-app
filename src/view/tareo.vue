@@ -168,7 +168,7 @@ export default {
         listarProcesos(){
             var t=this;
             db.transaction((tx)=>{
-                tx.executeSql('SELECT * FROM PROCESO', [], function (tx, results) {
+                tx.executeSql('SELECT * FROM PROCESO WHERE fundo_id=?', [this.cuenta.fundo_id], function (tx, results) {
                     t.procesos=[];
                     for (let i = 0; i < results.rows.length; i++) {
                         t.procesos.push(results.rows.item(i));
@@ -213,7 +213,7 @@ export default {
         openPendientes(){
             var t=this;
             db.transaction((tx)=>{
-                tx.executeSql('SELECT M.codigo_operador FROM MARCADOR M LEFT JOIN (SELECT * FROM TAREO WHERE DATE(fecha)=?) T ON M.codigo_operador=T.codigo_operador WHERE T.codigo_operador is NUll AND DATE(M.ingreso)=? GROUP BY M.codigo_operador', [moment().format('YYYY-MM-DD'),moment().format('YYYY-MM-DD')], function (tx, results) {
+                tx.executeSql('SELECT M.codigo_operador FROM MARCADOR M LEFT JOIN (SELECT * FROM TAREO WHERE DATE(fecha)=?) T ON M.codigo_operador=T.codigo_operador WHERE T.codigo_operador is NUll AND DATE(M.ingreso)=? AND M.fundo_id=? GROUP BY M.codigo_operador', [moment().format('YYYY-MM-DD'),moment().format('YYYY-MM-DD'),this.cuenta.fundo_id], function (tx, results) {
                     t.reporte=[];
                     for (let i = 0; i < results.rows.length; i++) {
                         t.reporte.push(results.rows.item(i));

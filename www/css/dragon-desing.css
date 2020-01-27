@@ -429,3 +429,7 @@ body >div{
 .table-striped tbody tr:nth-of-type(odd) {
     background-color: rgba(0,0,0,0.1);
 }
+
+html{
+    height: 100%;
+}

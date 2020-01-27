@@ -21,6 +21,16 @@
                  </div>
              </div>
         </div>
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Limpiar Datos</h5>
+                </div>
+                <div class="card-body">
+                    <button @click="limpiar" class="btn btn-success">Datos ya enviados</button>
+                </div>
+            </div>
+        </div>
         
     </div>
 </template>
@@ -136,6 +146,14 @@ export default {
                     });
                 },errorCB);
             });
+            
+        },
+        limpiar(){
+            var fecha=moment().subtract(2,'days').format('YYYY-MM-DD');  
+            db.transaction((tx)=>{
+                tx.executeSql('DELETE FROM MARCADOR WHERE enviado=? AND DATE(ingreso)=?', ["SI",fecha], function (tx, results) {
+                },errorCB);
+            });    
             
         }
     },

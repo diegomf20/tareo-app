@@ -61,6 +61,11 @@ if (store.state.cuenta!=null) {
 import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 
+var login=(to, from,next)=>{
+  $('.modal-backdrop').remove();
+  // $('.background-sidebar').remove();
+  next();
+};
 var auth=(to, from,next)=>{
   $('.modal-backdrop').remove();
   store.state.sidebar.statusSidebar=false;
@@ -95,7 +100,10 @@ var routes =[
   { 
     path: '/login', 
     component: require('./view/login.vue').default,
-    // beforeEnter: auth
+    beforeEnter: login,
+    meta:{
+      layout: "empty",
+    },
   },
   // { 
   //   path: '/marcador2', 
