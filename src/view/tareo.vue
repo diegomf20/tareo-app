@@ -115,7 +115,7 @@ export default {
     mounted() {
         db.transaction((tx)=>{
             // tx.executeSql('DROP TABLE IF EXISTS TAREO');
-            tx.executeSql('CREATE TABLE IF NOT EXISTS TAREO (codigo_operador,proceso_id,labor_id,area_id,fecha,fundo_id,enviado)');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS TAREO (codigo_operador,proceso_id,labor_id,area_id,fecha,fundo_id,enviado,cuenta_id)');
             tx.executeSql('CREATE TABLE IF NOT EXISTS AREA (id, nom_area)');
             tx.executeSql('CREATE TABLE IF NOT EXISTS LABOR (id, nom_labor,area_id)');
             tx.executeSql('CREATE TABLE IF NOT EXISTS PROCESO (id, nom_proceso,fundo_id)');
@@ -186,8 +186,8 @@ export default {
                 if (((null==this.tareo.codigo_barras) ? '' : this.tareo.codigo_barras ).length==8) {
                     db.transaction((tx)=>{
                         if (t.tareo.codigo_barras!=null&&t.tareo.proceso_id!=null&&t.tareo.labor_id!=null&&t.tareo.area_id!=null) {
-                            tx.executeSql('INSERT INTO TAREO(codigo_operador,proceso_id,labor_id,area_id,fecha,fundo_id,enviado) VALUES (?,?,?,?,?,?,"NO")',
-                            [t.tareo.codigo_barras,t.tareo.proceso_id,t.tareo.labor_id,t.tareo.area_id,moment().format('YYYY-MM-DD'),t.cuenta.fundo_id],()=>{
+                            tx.executeSql('INSERT INTO TAREO(codigo_operador,proceso_id,labor_id,area_id,fecha,fundo_id,enviado,cuenta_id) VALUES (?,?,?,?,?,?,"NO",?)',
+                            [t.tareo.codigo_barras,t.tareo.proceso_id,t.tareo.labor_id,t.tareo.area_id,moment().format('YYYY-MM-DD'),t.cuenta.fundo_id,t.cuenta.id],()=>{
                                 t.alert={
                                     status: 'success',
                                     data: 'Tareo Registrado.'
