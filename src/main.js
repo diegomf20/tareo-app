@@ -89,6 +89,11 @@ var routes =[
     beforeEnter: auth  
   },
   {
+    path: '/home',
+    component: require('./view/home.vue').default,
+    beforeEnter: auth  
+  },
+  {
     path: '/sincronizador',
     component: require('./view/sincronizador.vue').default,
     beforeEnter: auth  

@@ -67,7 +67,7 @@ export default {
                     // console.log(cod_barras_paso);
                     var t=this;
                     db.transaction((tx)=>{
-                        tx.executeSql('CREATE TABLE IF NOT EXISTS MARCADOR (codigo_operador,ingreso,salida,fundo_id,enviado)');
+                        tx.executeSql('CREATE TABLE IF NOT EXISTS MARCADOR (codigo_operador,ingreso,salida,fundo_id,enviado,cuenta_id)');
                         // console.log(t.alert);
                         
                         /**
@@ -109,8 +109,11 @@ export default {
                                         /**
                                          * Agregar Marca
                                          */
+                                        console.log(t.cuenta);
                                         
-                                        tx.executeSql('INSERT INTO MARCADOR (codigo_operador,ingreso,fundo_id,enviado) VALUES (?,?,?,"NO")',[cod_barras_paso,moment().format('YYYY-MM-DD HH:mm'),t.cuenta.fundo_id],t.marcaRegistrada); 
+                                        tx.executeSql('INSERT INTO MARCADOR (codigo_operador,ingreso,fundo_id,enviado,cuenta_id) VALUES (?,?,?,"NO",?)',
+                                            [cod_barras_paso,moment().format('YYYY-MM-DD HH:mm'),t.cuenta.fundo_id,t.cuenta.id]
+                                        ,t.marcaRegistrada); 
                                         // console.log('inserta');
                                                                        
                                     }else{
@@ -131,7 +134,9 @@ export default {
                                     //     ]);
                                 
                             }else{
-                                tx.executeSql('INSERT INTO MARCADOR (codigo_operador,ingreso,fundo_id,enviado) VALUES (?,?,?,"NO")',[cod_barras_paso,moment().format('YYYY-MM-DD HH:mm'),t.cuenta.fundo_id],t.marcaRegistrada);                                
+                                tx.executeSql('INSERT INTO MARCADOR (codigo_operador,ingreso,fundo_id,enviado,cuenta_id) VALUES (?,?,?,"NO",?)',
+                                    [cod_barras_paso,moment().format('YYYY-MM-DD HH:mm'),t.cuenta.fundo_id,t.cuenta.id],
+                                t.marcaRegistrada);                                
                             }
 
                         });

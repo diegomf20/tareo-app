@@ -146,20 +146,22 @@ export default {
             db.transaction((tx)=>{
                 tx.executeSql('SELECT * FROM AREA', [], function (tx, results) {
                     t.areas=[];
+                    
                     for (let i = 0; i < results.rows.length; i++) {
                         var area=results.rows.item(i);
-                        tx.executeSql('SELECT * FROM LABOR WHERE area_id="'+area.id+'" ORDER BY rowid DESC', [], function (tx, results2) {
+                        area.labores=[];
+                        t.areas.push(area);
+                        tx.executeSql('SELECT "'+i+'" as i , LABOR.* FROM LABOR WHERE area_id="'+area.id+'" ORDER BY rowid DESC', [], function (tx, results2) {
                             var labores=[];
                             for (let j = 0; j < results2.rows.length; j++) {
                                 var labor = results2.rows.item(j);
                                 labores.push(labor);
                             }
-                            area.labores=labores;
-                            t.areas.push(area);
-                        })
+                            t.areas[labor.i].labores=labores;
+                        },errorCB)
                     }
                 }); 
-            },errorCB);
+            });
             // axios.get(url_base+'/area/labor')
             // .then(response => {
             //     this.areas = response.data;

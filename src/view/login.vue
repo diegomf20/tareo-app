@@ -59,7 +59,7 @@ export default {
             });
         },
         ingresar(){
-            axios.post(url_base+'/login',this.cuenta)
+            axios.post(url_base+'/login?fundo_id='+this.fundo_id,this.cuenta)
             .then(response => {
                 var respuesta=response.data;
                 switch (respuesta.status) {

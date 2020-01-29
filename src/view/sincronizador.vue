@@ -124,7 +124,7 @@ export default {
         enviarMarcador(){
             var t=this;
             db.transaction((tx)=>{
-                tx.executeSql('SELECT MARCADOR.*,rowid FROM MARCADOR WHERE enviado="NO" AND salida is NOT NULL', [], function (tx, results) {
+                tx.executeSql('SELECT MARCADOR.*,rowid FROM MARCADOR WHERE enviado="NO" AND (salida is NOT NULL OR (salida is NULL AND ingreso<datetime("now","-1 day") ))', [], function (tx, results) {
                     t.listaMarcador=[];
                     for (let i = 0; i < results.rows.length; i++) {
                         t.listaMarcador.push(results.rows.item(i));
@@ -149,12 +149,16 @@ export default {
             
         },
         limpiar(){
-            var fecha=moment().subtract(2,'days').format('YYYY-MM-DD');  
             db.transaction((tx)=>{
-                tx.executeSql('DELETE FROM MARCADOR WHERE enviado=? AND DATE(ingreso)=?', ["SI",fecha], function (tx, results) {
+                tx.executeSql('DELETE FROM MARCADOR WHERE enviado="SI" AND ingreso<=datetime("now","-1 day")', [], function (tx, results) {
+                    swal("", 'Datos Antiguos Eliminados.', "info");
                 },errorCB);
             });    
-            
+            db.transaction((tx)=>{
+                tx.executeSql('DELETE FROM TAREO WHERE enviado="SI" AND fecha<=datetime("now","-2 day")', [], function (tx, results) {
+                    swal("", 'Datos Antiguos Eliminados.', "info");
+                },errorCB);
+            });    
         }
     },
 }

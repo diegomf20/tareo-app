@@ -1,6 +1,12 @@
 <template>
     <ul>
         <li>
+            <router-link to="home">
+                <i class="fab fa-algolia"></i>
+                <p>home</p>
+            </router-link>
+        </li>
+        <li>
             <router-link to="marcador">
                 <i class="fab fa-algolia"></i>
                 <p>marcador</p>
