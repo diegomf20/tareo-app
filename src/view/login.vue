@@ -8,18 +8,37 @@
                 <div class="col-lg-4 col-sm-6">
                     <div class="card card-login my-3">
                         <div class="card-body">
-                            <form v-on:submit.prevent="ingresar">
+                            <form v-on:submit.prevent="seleccionarFundo">
                                 <Input title="Usuario" v-model="cuenta.usuario"></Input>
                                 <Input title="Contraseña" type="password" v-model="cuenta.password"></Input>
-                                <select class="form-control mb-3" v-model="fundo_id">
-                                    <option v-for="fundo in fundos" :value="fundo.id">{{ fundo.nom_fundo }}</option>
-                                </select>
                                 <div class="text-center">
-                                    <button type="submit" class="btn btn-danger">
+                                    <button type="submit" class="btn btn-primary">
                                         Ingresar
-                                    </button>
+                                    </button>  
                                 </div>
                             </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="modal-fundos" class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Seleccionar Fundo</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <select class="form-control mb-3" v-model="fundo_id">
+                            <option v-for="fundo in fundos" :value="fundo.id">{{ fundo.nom_fundo }}</option>
+                        </select>
+                        <div class="text-center">
+                            <button @click="ingresar" type="submit" class="btn btn-danger">
+                                Continuar
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -41,11 +60,12 @@ export default {
                 password: null
             },
             fundos:[],
-            fundo_id: null
+            fundo_id: null,
+            cuenta_logeada: null
         }
     },
     mounted() {
-        this.listarFundo();
+        // this.listarFundo();
     },
     methods: {
         listarFundo(){
@@ -59,6 +79,11 @@ export default {
             });
         },
         ingresar(){
+            this.cuenta_logeada.fundo_id=this.fundo_id;
+            this.$store.commit('auth_success', this.cuenta_logeada);
+            this.$router.push({path: "/"} );
+        },
+        seleccionarFundo(){
             axios.post(url_base+'/login?fundo_id='+this.fundo_id,this.cuenta)
             .then(response => {
                 var respuesta=response.data;
@@ -68,10 +93,15 @@ export default {
                         break;
                     case "OK":
                         swal("", "Cuenta Iniciada.", "success");
-                        var usuario=respuesta.data;
-                        usuario.fundo_id=this.fundo_id;
-                        this.$store.commit('auth_success', usuario);
-                        this.$router.push({path: "/"} );
+                        this.cuenta_logeada=respuesta.data;
+                        axios.get(url_base+'/fundo?usuario='+this.cuenta.usuario)
+                        .then(response => {
+                            this.fundos=response.data;
+                            if (this.fundos.length>0) {
+                                this.fundo_id=this.fundos[0].id;
+                            }
+                        });
+                        $('#modal-fundos').modal();
                         break;
                     default:
                         break;

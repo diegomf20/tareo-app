@@ -3,6 +3,6 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">localhost</domain>
         <domain includeSubdomains="true">stackpath.bootstrapcdn.com</domain>
-        <domain includeSubdomains="true">192.168.1.242</domain>
+        <domain includeSubdomains="true">172.16.1.112</domain>
     </domain-config>
 </network-security-config>
