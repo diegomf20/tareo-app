@@ -9,6 +9,29 @@
         <link rel="stylesheet" type="text/css" href="css/dragon-desing.css">
         <link rel="stylesheet" type="text/css" href="fontawesome/css/all.css">
         <title>TAREO EN CAMPO</title>
+        <style>
+            .modal .modal-dialog {
+                -webkit-transform: scale(0.1);
+                -moz-transform: scale(0.1);
+                -ms-transform: scale(0.1);
+                transform: scale(0.1);
+                top: 0px;
+                opacity: 0;
+                -webkit-transition: all 0.3s;
+                -moz-transition: all 0.3s;
+                transition: all 0.3s;
+            }
+
+            .modal.show .modal-dialog {
+                -webkit-transform: scale(1);
+                -moz-transform: scale(1);
+                -ms-transform: scale(1);
+                transform: scale(1);
+                -webkit-transform: translate3d(0, 0px, 0);
+                transform: translate3d(0, 0px, 0);
+                opacity: 1;
+            }
+        </style>
     </head>
     <body>
         <div id="app"></div>

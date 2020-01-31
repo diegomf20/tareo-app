@@ -23,7 +23,7 @@
             </div>
         </div>
         <div id="modal-fundos" class="modal" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Seleccionar Fundo</h5>
@@ -92,7 +92,7 @@ export default {
                         swal("", respuesta.data, "error");
                         break;
                     case "OK":
-                        swal("", "Cuenta Iniciada.", "success");
+                        // swal("", "Cuenta Iniciada.", "success");
                         this.cuenta_logeada=respuesta.data;
                         axios.get(url_base+'/fundo?usuario='+this.cuenta.usuario)
                         .then(response => {
