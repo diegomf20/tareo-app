@@ -9,6 +9,29 @@
         <link rel="stylesheet" type="text/css" href="css/dragon-desing.css">
         <link rel="stylesheet" type="text/css" href="fontawesome/css/all.css">
         <title>TAREO EN CAMPO</title>
+        <style>
+            .modal .modal-dialog {
+                -webkit-transform: scale(0.1);
+                -moz-transform: scale(0.1);
+                -ms-transform: scale(0.1);
+                transform: scale(0.1);
+                top: 0px;
+                opacity: 0;
+                -webkit-transition: all 0.3s;
+                -moz-transition: all 0.3s;
+                transition: all 0.3s;
+            }
+
+            .modal.show .modal-dialog {
+                -webkit-transform: scale(1);
+                -moz-transform: scale(1);
+                -ms-transform: scale(1);
+                transform: scale(1);
+                -webkit-transform: translate3d(0, 0px, 0);
+                transform: translate3d(0, 0px, 0);
+                opacity: 1;
+            }
+        </style>
     </head>
     <body>
         <div id="app"></div>
@@ -25,7 +48,8 @@
             function successCB() {
                 // alert("success!");
             }
-            window.url_base="http://172.16.1.112:8080/api";
+            window.url_base="http://192.168.1.242:80/api";
+            // window.url_base="http://172.16.1.112:8080/api";
             window.db = window.openDatabase("asistencia", "1.0", "AppTareo", 200000);
         </script>
         <script type="text/javascript" src="js/app.js"></script>

@@ -8,7 +8,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "paso": "cross-env NODE_ENV=development webpack --watch --progress --hide-modules",
     "prod": "cross-env NODE_ENV=production webpack --hide-modules"
-
   },
   "keywords": [
     "ecosystem:cordova"
