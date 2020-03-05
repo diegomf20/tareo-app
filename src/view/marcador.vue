@@ -64,22 +64,23 @@ export default {
                 if (this.codigo_barras.length==8) {
                     var cod_barras_paso=this.codigo_barras;
                     this.codigo_barras=null;
-                    // console.log(cod_barras_paso);
                     var t=this;
                     db.transaction((tx)=>{
-                        tx.executeSql('CREATE TABLE IF NOT EXISTS MARCADOR (codigo_operador,ingreso,salida,fundo_id,enviado,cuenta_id)');
-                        // console.log(t.alert);
-                        
                         /**
                          * Comprobacion.
                          */
-                        var anterior_marca=null;
+                        var fecha_consulta=(moment().format('HH')<moment().format('07')) ? moment().subtract(1,'day').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
+                        // console.log(fecha_consulta);
+                        
 
-                        tx.executeSql('SELECT rowid,* FROM MARCADOR WHERE codigo_operador=? ORDER BY rowid DESC LIMIT 1', [cod_barras_paso], function (tx, results) {
-                            // console.log(t.cuenta);
+                        tx.executeSql('SELECT rowid,*,datetime("now","-15 hour") FROM MARCADOR WHERE codigo_operador=? AND ingreso > ?  ORDER BY rowid DESC LIMIT 1', [cod_barras_paso,moment().subtract(15,'hour')], function (tx, results) {
+
+                            var anterior_marca=null;
                             
                             for (let j = 0; j < results.rows.length; j++) {
                                 anterior_marca = results.rows.item(j);
+                                console.log(anterior_marca);
+                                
                             }
 
                             if (anterior_marca!=null) {
@@ -109,34 +110,34 @@ export default {
                                         /**
                                          * Agregar Marca
                                          */
-                                        console.log(t.cuenta);
-                                        
-                                        tx.executeSql('INSERT INTO MARCADOR (codigo_operador,ingreso,fundo_id,enviado,cuenta_id) VALUES (?,?,?,"NO",?)',
-                                            [cod_barras_paso,moment().format('YYYY-MM-DD HH:mm'),t.cuenta.fundo_id,t.cuenta.id]
+                                        tx.executeSql('INSERT INTO MARCADOR (codigo_operador,ingreso,fecha_ref,fundo_id,enviado,cuenta_id) VALUES (?,?,?,?,"NO",?)',
+                                            [
+                                                cod_barras_paso,
+                                                moment().format('YYYY-MM-DD HH:mm'),
+                                                moment().format('YYYY-MM-DD'),
+                                                t.cuenta.fundo_id,
+                                                t.cuenta.id
+                                            ]
                                         ,t.marcaRegistrada); 
-                                        // console.log('inserta');
-                                                                       
                                     }else{
-                                        // console.log('actualiza');
                                         /**
                                          * Actualizar Marca
                                          */
                                         tx.executeSql('UPDATE MARCADOR SET salida="'+moment().format('YYYY-MM-DD HH:mm')+'" WHERE rowid=?',[anterior_marca.rowid],t.marcaRegistrada);
                                     }
-
-
-
-
                                 }
-                                    // return response()->json([
-                                    //         "status"    =>  "ERROR",
-                                    //         "data"      =>  "Usted marco recientemente"
-                                    //     ]);
-                                
                             }else{
-                                tx.executeSql('INSERT INTO MARCADOR (codigo_operador,ingreso,fundo_id,enviado,cuenta_id) VALUES (?,?,?,"NO",?)',
-                                    [cod_barras_paso,moment().format('YYYY-MM-DD HH:mm'),t.cuenta.fundo_id,t.cuenta.id],
-                                t.marcaRegistrada);                                
+                                tx.executeSql('INSERT INTO MARCADOR (codigo_operador,ingreso,fecha_ref,fundo_id,enviado,cuenta_id) VALUES (?,?,?,?,"NO",?)',
+                                    [
+                                        cod_barras_paso,
+                                        moment().format('YYYY-MM-DD HH:mm'),
+                                        moment().format('YYYY-MM-DD'),
+                                        t.cuenta.fundo_id,
+                                        t.cuenta.id
+                                    ],
+                                t.marcaRegistrada,
+                                errorCB
+                                );                                
                             }
 
                         });

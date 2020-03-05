@@ -4,8 +4,8 @@
   "name": "AppTareo",
   "short_name": "AppTareo",
   "version": "io.diegomf20.tareo",
-  "description": "A sample Apache Cordova application that responds to the deviceready event.",
-  "author": "Apache Cordova Team",
+  "description": "Aplicación para control de asistencia y tareo en campo.",
+  "author": "Diego MF Desarrollos",
   "icons": [],
   "start_url": "index.html"
 }

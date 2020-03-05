@@ -2,10 +2,10 @@
 <widget id="io.diegomf20.tareo" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>AppTareo</name>
     <description>
-        A sample Apache Cordova application that responds to the deviceready event.
+        Aplicación para control de asistencia y tareo en campo.
     </description>
-    <author email="dev@cordova.apache.org" href="http://cordova.io">
-        Apache Cordova Team
+    <author email="diegomf.mendoza@gmail.com">
+        Diego MF Desarrollos
     </author>
     <content src="index.html" />
     <access origin="*" />
