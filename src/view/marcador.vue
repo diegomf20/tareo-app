@@ -70,10 +70,11 @@ export default {
                          * Comprobacion.
                          */
                         var fecha_consulta=(moment().format('HH')<moment().format('07')) ? moment().subtract(1,'day').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
-                        // console.log(fecha_consulta);
+                        
+                        
                         
 
-                        tx.executeSql('SELECT rowid,*,datetime("now","-15 hour") FROM MARCADOR WHERE codigo_operador=? AND ingreso > ?  ORDER BY rowid DESC LIMIT 1', [cod_barras_paso,moment().subtract(15,'hour')], function (tx, results) {
+                        tx.executeSql('SELECT rowid,*,datetime("now","-14 hour") FROM MARCADOR WHERE codigo_operador=? AND ingreso > ?  ORDER BY rowid DESC LIMIT 1', [cod_barras_paso,moment().subtract(15,'hour').format('YYYY-MM-DD')], function (tx, results) {
 
                             var anterior_marca=null;
                             
@@ -84,7 +85,7 @@ export default {
                             }
 
                             if (anterior_marca!=null) {
-                                var fecha_limite = moment().subtract(1,'minutes');
+                                // var fecha_limite = moment().subtract(1,'minutes');
                                 
                                 if(
                                     (anterior_marca.salida==null&&moment().diff(anterior_marca.ingreso,'minutes')<1)
@@ -95,7 +96,7 @@ export default {
                                     }
                                 }else{
                                     var hora_fecha_actual=moment();
-                                    var hora_fecha_limite=moment().startOf('day').add(6,'hours');
+                                    var hora_fecha_limite=moment().startOf('day').add(8,'hours');
                                     var fecha_ayer=moment().subtract(1,'days').format('YYYY-MM-DD');
                                     if (
                                         anterior_marca==null||
