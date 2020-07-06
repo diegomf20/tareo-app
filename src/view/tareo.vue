@@ -16,13 +16,13 @@
                                 <thead>
                                     <tr>
                                         <th>DNI</th>
-                                        <!-- <th>Nombre y Apellidos</th> -->
+                                        <th>Nombre</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="item in reporte">
                                         <td>{{ item.codigo_operador }}</td>
-                                        <!-- <td>{{ item.nom_operador }} {{ item.ape_operador }}</td> -->
+                                        <td>{{ item.nom_operador }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -98,7 +98,7 @@ export default {
                 linea_id:null,
                 codigo_barras:null
             },
-            fecha: moment().subtract(2, 'd').format('YYYY-MM-DD'),
+            fecha: moment().format('YYYY-MM-DD'),
             turnos:[],
             lineas:[],
             areas:[],
@@ -114,7 +114,7 @@ export default {
     mounted() {
         
         this.listarProcesos();
-        this.listarAreasLabor();
+        this.listarAreasLabor();        
     },
     computed: {
         ...mapState(['cuenta']),
@@ -123,7 +123,6 @@ export default {
                 const area = this.areas[i];
                 if (area.id==this.tareo.area_id) {
                     this.tareo.labor_id=null;
-                    console.log(area.labores);
                     return area.labores;
                 }
             }
@@ -167,64 +166,74 @@ export default {
                 }); 
             },errorCB); 
         },
-
         guardar(){
             this.$nextTick(() =>{
                 var t=this;
-
                 if (((null==this.tareo.codigo_barras) ? '' : this.tareo.codigo_barras ).length==8) {
-                    db.transaction((tx)=>{
-                        if (t.tareo.codigo_barras!=null&&t.tareo.proceso_id!=null&&t.tareo.labor_id!=null&&t.tareo.area_id!=null) {
-                            tx.executeSql('INSERT INTO TAREO(codigo_operador,proceso_id,labor_id,area_id,fecha,fundo_id,enviado,cuenta_id) VALUES (?,?,?,?,?,?,"NO",?)',
-                            [t.tareo.codigo_barras,t.tareo.proceso_id,t.tareo.labor_id,t.tareo.area_id,moment().format('YYYY-MM-DD'),t.cuenta.fundo_id,t.cuenta.id],()=>{
-                                t.alert={
-                                    status: 'success',
-                                    data: 'Tareo Registrado.'
+                    if (t.tareo.codigo_barras!=null&&t.tareo.proceso_id!=null&&t.tareo.labor_id!=null&&t.tareo.area_id!=null) {
+                        db.transaction((tx)=>{
+                            var query='SELECT * FROM ASISTENCIA WHERE fecha_ref=? AND codigo_operador=?';
+                            tx.executeSql( query, [ moment().format('YYYY-MM-DD'),t.tareo.codigo_barras], 
+                            function (tx, results) {
+                                var message="";
+                                // console.log(results)
+                                // console.log(results.rows.length);
+                                
+                                if (results.rows.length>0) {
+                                    message="Tareo Correcto: ("+results.rows.item(0).nom_operador+")";
+                                }else{
+                                    message="Tareo sin asistencia";
                                 }
-                            },errorCB);              
-                        }else{
-                            t.alert={
-                                status: 'danger',
-                                data: 'Campos Vacios.'
-                            }
-
+                                
+                                tx.executeSql('INSERT INTO TAREO(codigo_operador,proceso_id,labor_id,area_id,fecha,fundo_id,enviado,cuenta_id) VALUES (?,?,?,?,?,?,"NO",?)',
+                                [t.tareo.codigo_barras,t.tareo.proceso_id,t.tareo.labor_id,t.tareo.area_id,moment().format('YYYY-MM-DD'),t.cuenta.fundo_id,t.cuenta.id],()=>{
+                                    t.tareo.codigo_barras=null;
+                                    t.alert={
+                                        status: 'success',
+                                        data: message
+                                    }
+                                },errorCB);              
+                            },errorCB, successCB);
+                        }, errorCB, successCB);
+                    }else{
+                        t.alert={
+                            status: 'danger',
+                            data: 'Campos Vacios.'
                         }
-                        this.tareo.codigo_barras=null;
-                    });
+
+                    }
                 }else{
                     this.tareo.codigo_barras=null;
                     this.alert={
                         status: 'danger',
                         data: 'Código no Valido'
                     }
-                    // this.clearAlert();
                 }
             })
         },
         openPendientes(){
             var t=this;
-            axios.get(url_base+'/reporte-pendientes?fecha='+this.fecha+'&fundo_id='+this.cuenta.fundo_id)
-            .then(response => {
-                db.transaction((tx)=>{
-                    var reporte = response.data;
-                    for (let i = 0; i < reporte.length; i++) {
-                        const item = reporte[i];
-                        tx.executeSql('INSERT INTO ASISTENCIA (codigo_operador,descripcion,fecha_ref,fundo_id) VALUES (?,?,?,?)',
-                            [item.dni,`${item.nom_operador} ${item.ape_operador}`,item.fecha_ref,item.fundo_id]
-                        ); 
+            db.transaction((tx)=>{
+                var query='SELECT A.codigo_operador,A.nom_operador FROM ASISTENCIA as A '+
+                        'LEFT JOIN (SELECT * FROM TAREO '+
+                            'WHERE TAREO.fundo_id="'+t.cuenta.fundo_id+'" '+
+                                'AND TAREO.fecha="'+moment().format('YYYY-MM-DD')+'") as T  '
+                        +'ON A.codigo_operador=T.codigo_operador '+
+                        'WHERE T.labor_id is NULL AND '
+                        +'A.fundo_id="'+t.cuenta.fundo_id+'" AND A.fecha_ref=? '+'GROUP BY A.codigo_operador,A.nom_operador';
+                console.log(query);
+                tx.executeSql(
+                    query, 
+                [
+                    moment().format('YYYY-MM-DD')
+                ], function (tx, results) {
+                    t.listaTareo=[];
+                    t.reporte=[];
+                    for (let i = 0; i < results.rows.length; i++) {
+                        t.reporte.push(results.rows.item(i));
                     }
-                }, errorCB, successCB);
-            });
-
-            // db.transaction((tx)=>{
-            //     tx.executeSql('SELECT M.codigo_operador FROM MARCADOR M LEFT JOIN (SELECT * FROM TAREO WHERE DATE(fecha)=?) T ON M.codigo_operador=T.codigo_operador WHERE T.codigo_operador is NUll AND DATE(M.ingreso)=? AND M.fundo_id=? GROUP BY M.codigo_operador', [moment().format('YYYY-MM-DD'),moment().format('YYYY-MM-DD'),this.cuenta.fundo_id], function (tx, results) {
-            //         t.reporte=[];
-            //         for (let i = 0; i < results.rows.length; i++) {
-            //             t.reporte.push(results.rows.item(i));
-            //         }
-            //     // this.reporte = response.data;
-            //     },errorCB); 
-            // },errorCB); 
+                },errorCB, successCB);
+            }, errorCB, successCB);
             $('#modal-pendientes').modal();
         }
     },

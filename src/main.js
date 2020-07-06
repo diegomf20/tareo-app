@@ -79,11 +79,6 @@ var auth=(to, from,next)=>{
 
 var routes =[
   {
-    path: '/marcador',
-    component: require('./view/marcador.vue').default,
-    beforeEnter: auth
-  },
-  {
     path: '/tareo',
     component: require('./view/tareo.vue').default,
     beforeEnter: auth  
@@ -100,7 +95,7 @@ var routes =[
   },
   {
     path: '/',
-    redirect: '/marcador'
+    redirect: '/tareo'
   },
   { 
     path: '/login', 
@@ -110,11 +105,6 @@ var routes =[
       layout: "empty",
     },
   },
-  // { 
-  //   path: '/marcador2', 
-  //   component: require('./view/Operacion/marcador2.vue').default,
-  //   beforeEnter: auth
-  // }
 ];
 var router=new VueRouter({
   // mode: 'history',

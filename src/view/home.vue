@@ -26,20 +26,10 @@
         <div class="col-6">
             <div class="card">
                 <div class="card-header">
-                    <h6>No Eliminables</h6>
+                    <h6>Enviados</h6>
                 </div>
                 <div class="card-body">
                     <h4>{{ count_total-count_enviar-count_antiguo }}</h4>
-                </div>
-            </div>
-        </div>
-        <div class="col-6">
-            <div class="card">
-                <div class="card-header">
-                    <h6>Eliminables</h6>
-                </div>
-                <div class="card-body">
-                    <h4>{{ count_antiguo }}</h4>
                 </div>
             </div>
         </div>
@@ -63,7 +53,7 @@ export default {
         total(){
             var t=this;
             db.transaction((tx)=>{
-                tx.executeSql('SELECT COUNT(*) cantidad FROM MARCADOR', [], function (tx, results) {
+                tx.executeSql('SELECT COUNT(*) cantidad FROM TAREO', [], function (tx, results) {
                     t.count_total=results.rows.item(0).cantidad
                 },errorCB);
             });    
@@ -71,7 +61,7 @@ export default {
         antiguos(){
             var t=this;
             db.transaction((tx)=>{
-                tx.executeSql('SELECT COUNT(*) cantidad FROM MARCADOR WHERE enviado="SI" AND ingreso<=datetime("now","-1 day")', [], function (tx, results) {
+                tx.executeSql('SELECT COUNT(*) cantidad FROM TAREO WHERE enviado="SI" AND fecha!="'+moment().format('YYYY-MM-DD')+'"', [], function (tx, results) {
                     t.count_antiguo=results.rows.item(0).cantidad
                 },errorCB);
             });    
@@ -79,12 +69,11 @@ export default {
         enviables(){
             var t=this;
             db.transaction((tx)=>{
-                tx.executeSql('SELECT COUNT(*) cantidad FROM MARCADOR WHERE enviado="NO" AND (salida is NOT NULL OR (salida is NULL AND ingreso<datetime("now","-1 day") ))', [], function (tx, results) {
+                tx.executeSql('SELECT COUNT(*) cantidad FROM TAREO WHERE enviado="NO" AND fecha="'+moment().format('YYYY-MM-DD')+'"', [], function (tx, results) {
                     t.count_enviar=results.rows.item(0).cantidad
                 },errorCB);
             });    
         },
-
     },
 }
 </script>

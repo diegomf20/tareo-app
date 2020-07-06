@@ -13,6 +13,16 @@
         <div class="col-sm-6">
              <div class="card">
                  <div class="card-header">
+                    <h5 class="card-title">Recibir Asistencia</h5>
+                 </div>
+                 <div class="card-body">
+                     <button @click="recibirAsistencia" class="btn btn-success">Asistencias</button>
+                 </div>
+             </div>
+        </div>
+        <div class="col-sm-6">
+             <div class="card">
+                 <div class="card-header">
                     <h5 class="card-title">Enviar Datos</h5>
                  </div>
                  <div class="card-body">
@@ -34,6 +44,8 @@
     </div>
 </template>
 <script>
+import { mapState,mapMutations } from 'vuex'
+
 export default {
     data() {
         return {
@@ -41,11 +53,16 @@ export default {
             listaMarcador: []
         }
     },
+    computed: {
+        ...mapState(['cuenta']),
+    },
     methods: {
         recibirAsistencia(){
-            axios.get(url_base+'/sincronizar/asistencia?fecha=')
+            axios.get(url_base+'/sincronizar/asistencia?fecha='+moment().format('YYYY-MM-DD')+'&fundo_id='+this.cuenta.fundo_id)
             .then(response => {
                 var asistencias = response.data;
+                console.log(asistencias);
+                
                 /**
                  * Limpiado y Guardado
                  */            
@@ -55,7 +72,7 @@ export default {
                     var i=0;
                     for (i = 0; i < asistencias.length; i++) {
                         var asistencia = asistencias[i];
-                        tx.executeSql('INSERT INTO AREA (id, nom_area) VALUES ("'+area.id+'","'+area.nom_area+'")'); 
+                        tx.executeSql('INSERT INTO ASISTENCIA(codigo_operador,nom_operador,fecha_ref,fundo_id) VALUES ("'+asistencia.codigo_operador+'","'+asistencia.nom_operador+'","'+asistencia.fecha_ref+'","'+asistencia.fundo_id+'")'); 
                     }
                     swal("","Asistencia Sincronizada" , 'info');
                 }, errorCB, successCB);
@@ -126,11 +143,8 @@ export default {
                     axios.post(url_base+'/sincronizar/tareo',{data: t.listaTareo})
                     .then(response => {
                         var respuesta=response.data;
-                        // console.log([respuesta.data].join());
                         db.transaction((tx)=>{
                             tx.executeSql('UPDATE TAREO SET ENVIADO="SI" WHERE rowid in ('+respuesta.data.join()+')',[],function (tx, results) {
-                                console.log(results);
-
                                 swal("", respuesta.data.length+" Tareos sincronizados.", "success"); 
                             });
                         });
@@ -142,11 +156,6 @@ export default {
             
         },
         limpiar(){
-            db.transaction((tx)=>{
-                tx.executeSql('DELETE FROM MARCADOR WHERE enviado="SI" AND ingreso<=datetime("now","-1 day")', [], function (tx, results) {
-                    swal("", 'Datos Antiguos Eliminados.', "info");
-                },errorCB);
-            });    
             db.transaction((tx)=>{
                 tx.executeSql('DELETE FROM TAREO WHERE enviado="SI" AND fecha<=datetime("now","-2 day")', [], function (tx, results) {
                     swal("", 'Datos Antiguos Eliminados.', "info");

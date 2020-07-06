@@ -28,12 +28,10 @@
 </template>
 <script>
 import { mapState,mapMutations } from 'vuex'
-import administrador from './parts/administrador.vue'
 import comun from './parts/comun.vue'
 
 export default {
     components:{
-        administrador,
         comun
     },
     computed: {
