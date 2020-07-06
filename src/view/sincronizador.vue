@@ -16,8 +16,7 @@
                     <h5 class="card-title">Enviar Datos</h5>
                  </div>
                  <div class="card-body">
-                     <button @click="enviarTareos" class="btn btn-success">Tareo</button>
-                     <button @click="enviarMarcador" class="btn btn-success">Marcador</button>
+                    <button @click="enviarTareos" class="btn btn-success">Tareo</button>
                  </div>
              </div>
         </div>
@@ -43,6 +42,27 @@ export default {
         }
     },
     methods: {
+        recibirAsistencia(){
+            axios.get(url_base+'/sincronizar/asistencia?fecha=')
+            .then(response => {
+                var asistencias = response.data;
+                /**
+                 * Limpiado y Guardado
+                 */            
+                db.transaction((tx)=>{
+                    tx.executeSql('DROP TABLE IF EXISTS ASISTENCIA');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS ASISTENCIA (codigo_operador, fecha_ref,nom_operador,fundo_id)');
+                    var i=0;
+                    for (i = 0; i < asistencias.length; i++) {
+                        var asistencia = asistencias[i];
+                        tx.executeSql('INSERT INTO AREA (id, nom_area) VALUES ("'+area.id+'","'+area.nom_area+'")'); 
+                    }
+                    swal("","Asistencia Sincronizada" , 'info');
+                }, errorCB, successCB);
+            }).catch(function(err) {
+                swal("", 'Error de conexión ' + err, "error");
+            });
+        },
         recibirDatos(){
             axios.get(url_base+'/area/labor')
             .then(response => {
@@ -112,33 +132,6 @@ export default {
                                 console.log(results);
 
                                 swal("", respuesta.data.length+" Tareos sincronizados.", "success"); 
-                            });
-                        });
-                    }).catch(function(err) {
-                        swal("", 'Error de conexión ' + err, "error");
-                    });
-                },errorCB);
-            });
-            
-        },
-        enviarMarcador(){
-            var t=this;
-            db.transaction((tx)=>{
-                tx.executeSql('SELECT MARCADOR.*,rowid FROM MARCADOR WHERE enviado="NO" AND (salida is NOT NULL OR (salida is NULL AND ingreso<datetime("now","-1 day") ))', [], function (tx, results) {
-                    t.listaMarcador=[];
-                    for (let i = 0; i < results.rows.length; i++) {
-                        t.listaMarcador.push(results.rows.item(i));
-                    }
-                    axios.post(url_base+'/sincronizar/marcador',{data: t.listaMarcador})
-                    .then(response => {
-                        var respuesta1=response.data;
-                        db.transaction((tx2)=>{
-                            var param1=respuesta1.data.join();
-                            tx2.executeSql('UPDATE MARCADOR SET ENVIADO="SI" WHERE rowid in ('+param1+')',[],function (tx2, results) {
-                                console.log(results);
-                                console.log(respuesta1.data.join());
-                                
-                                swal("", respuesta1.data.length+" datos de Marcador sincronizados.", "success"); 
                             });
                         });
                     }).catch(function(err) {

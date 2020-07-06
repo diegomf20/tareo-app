@@ -36,9 +36,7 @@
                     <h4 class="card-title text-center" v-else>TAREO <button class="btn btn-danger btn-sm btn-float-right" @click="openPendientes()">P</button></h4>
                 </div>
                 <div class="card-body">
-                    <!-- <Select title="Turno:" v-model="tareo.turno_id">
-                        <option v-for="turno in turnos" :value="turno.id">{{ turno.descripcion }}</option>
-                    </Select> -->
+                    <h5 class="mb-3">Fecha: {{ this.fecha }}</h5>
                     <Select title="Centro de Costo:" v-model="tareo.proceso_id">
                         <option value="">--SELECCIONAR C.COSTO--</option>
                         <option v-for="proceso in procesos" :value="proceso.id">{{ proceso.id+" - "+ proceso.nom_proceso }}</option>
@@ -100,6 +98,7 @@ export default {
                 linea_id:null,
                 codigo_barras:null
             },
+            fecha: moment().subtract(2, 'd').format('YYYY-MM-DD'),
             turnos:[],
             lineas:[],
             areas:[],
@@ -156,10 +155,6 @@ export default {
                     }
                 }); 
             });
-            // axios.get(url_base+'/area/labor')
-            // .then(response => {
-            //     this.areas = response.data;
-            // });
         },
         listarProcesos(){
             var t=this;
@@ -208,18 +203,28 @@ export default {
         },
         openPendientes(){
             var t=this;
-            db.transaction((tx)=>{
-                tx.executeSql('SELECT M.codigo_operador FROM MARCADOR M LEFT JOIN (SELECT * FROM TAREO WHERE DATE(fecha)=?) T ON M.codigo_operador=T.codigo_operador WHERE T.codigo_operador is NUll AND DATE(M.ingreso)=? AND M.fundo_id=? GROUP BY M.codigo_operador', [moment().format('YYYY-MM-DD'),moment().format('YYYY-MM-DD'),this.cuenta.fundo_id], function (tx, results) {
-                    t.reporte=[];
-                    for (let i = 0; i < results.rows.length; i++) {
-                        t.reporte.push(results.rows.item(i));
+            axios.get(url_base+'/reporte-pendientes?fecha='+this.fecha+'&fundo_id='+this.cuenta.fundo_id)
+            .then(response => {
+                db.transaction((tx)=>{
+                    var reporte = response.data;
+                    for (let i = 0; i < reporte.length; i++) {
+                        const item = reporte[i];
+                        tx.executeSql('INSERT INTO ASISTENCIA (codigo_operador,descripcion,fecha_ref,fundo_id) VALUES (?,?,?,?)',
+                            [item.dni,`${item.nom_operador} ${item.ape_operador}`,item.fecha_ref,item.fundo_id]
+                        ); 
                     }
-                // this.reporte = response.data;
-                },errorCB); 
-            },errorCB); 
-            // axios.get(url_base+'/reporte-pendientes?turno_id='+this.tareo.turno_id)
-            // .then(response => {
-            // })
+                }, errorCB, successCB);
+            });
+
+            // db.transaction((tx)=>{
+            //     tx.executeSql('SELECT M.codigo_operador FROM MARCADOR M LEFT JOIN (SELECT * FROM TAREO WHERE DATE(fecha)=?) T ON M.codigo_operador=T.codigo_operador WHERE T.codigo_operador is NUll AND DATE(M.ingreso)=? AND M.fundo_id=? GROUP BY M.codigo_operador', [moment().format('YYYY-MM-DD'),moment().format('YYYY-MM-DD'),this.cuenta.fundo_id], function (tx, results) {
+            //         t.reporte=[];
+            //         for (let i = 0; i < results.rows.length; i++) {
+            //             t.reporte.push(results.rows.item(i));
+            //         }
+            //     // this.reporte = response.data;
+            //     },errorCB); 
+            // },errorCB); 
             $('#modal-pendientes').modal();
         }
     },

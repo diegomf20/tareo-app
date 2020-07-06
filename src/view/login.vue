@@ -33,7 +33,7 @@
                     </div>
                     <div class="modal-body">
                         <select class="form-control mb-3" v-model="fundo_id">
-                            <option v-for="fundo in fundos" :value="fundo.id">{{ fundo.nom_fundo }}</option>
+                            <option v-for="fundo in fundos" :value="fundo">{{ fundo}}</option>
                         </select>
                         <div class="text-center">
                             <button @click="ingresar" type="submit" class="btn btn-danger">
@@ -94,7 +94,7 @@ export default {
                     case "OK":
                         // swal("", "Cuenta Iniciada.", "success");
                         this.cuenta_logeada=respuesta.data;
-                        axios.get(url_base+'/fundo?usuario='+this.cuenta.usuario)
+                        axios.get(url_base+'/privilegios',{ headers: {"Authorization" : `${this.cuenta_logeada.api_token}`} })
                         .then(response => {
                             this.fundos=response.data;
                             if (this.fundos.length>0) {
