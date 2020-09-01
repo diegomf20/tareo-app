@@ -1,12 +1,22 @@
 <template>
     <div class="row">
         <div class="col-12">
-            <h4>Resumen de Marcas en BD (Par de Marcas)</h4>
+            <h4>Resumen de Tareo</h4>
         </div>
         <div class="col-6">
             <div class="card">
                 <div class="card-header">
-                    <h6>Total</h6>
+                    <h6>Asistencias Hoy</h6>
+                </div>
+                <div class="card-body">
+                    <h4>{{ count_asistencia }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6>Total Datos</h6>
                 </div>
                 <div class="card-body">
                     <h4>{{ count_total }}</h4>
@@ -42,14 +52,24 @@ export default {
             count_antiguo: 0,
             count_enviar: 0,
             count_total: 0,
+            count_asistencia: 0
         }
     },
     mounted() {
         this.antiguos();
         this.total();
         this.enviables();
+        this.asistencia();
     },
     methods: {
+        asistencia(){
+            var t=this;
+            db.transaction((tx)=>{
+                tx.executeSql('SELECT COUNT(*) cantidad FROM ASISTENCIA', [], function (tx, results) {
+                    t.count_asistencia=results.rows.item(0).cantidad
+                },errorCB);
+            });    
+        },
         total(){
             var t=this;
             db.transaction((tx)=>{

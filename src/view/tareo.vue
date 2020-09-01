@@ -158,7 +158,7 @@ export default {
         listarProcesos(){
             var t=this;
             db.transaction((tx)=>{
-                tx.executeSql('SELECT * FROM PROCESO WHERE fundo_id=? OR fundo_id is NULL OR fundo_id=""', [this.cuenta.fundo_id], function (tx, results) {
+                tx.executeSql('SELECT * FROM PROCESO WHERE fundo_id=? OR fundo_id="null"', [this.cuenta.fundo_id], function (tx, results) {
                     t.procesos=[];
                     for (let i = 0; i < results.rows.length; i++) {
                         t.procesos.push(results.rows.item(i));
