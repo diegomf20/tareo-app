@@ -27,6 +27,7 @@
                  </div>
                  <div class="card-body">
                     <button @click="enviarTareos" class="btn btn-success">Tareo</button>
+                    <button @click="enviarMarcas" class="btn btn-success">Marcas</button>
                  </div>
              </div>
         </div>
@@ -154,6 +155,26 @@ export default {
                 },errorCB);
             });
             
+        },
+        enviarMarcas(){
+            var t=this;
+            db.transaction((tx)=>{
+                tx.executeSql('SELECT *,rowid FROM MARCAS', [], function (tx, results) {
+                    // console.log(results.rows);
+                    axios.post(url_base+'/sincronizar/in/marcas',{data: results.rows})
+                    .then(response => {
+                        db.transaction((tx)=>{
+                            tx.executeSql('DELETE FROM MARCAS');
+                            swal({
+                                title: "Good job!",
+                                text: "You clicked the button!",
+                                icon: "success",
+                            });
+
+                        });  
+                    });
+                });
+            });
         },
         limpiar(){
             db.transaction((tx)=>{

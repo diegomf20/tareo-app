@@ -79,6 +79,11 @@ var auth=(to, from,next)=>{
 
 var routes =[
   {
+    path: '/marcador',
+    component: require('./view/marcador.vue').default,
+    beforeEnter: auth  
+  },
+  {
     path: '/tareo',
     component: require('./view/tareo.vue').default,
     beforeEnter: auth  

@@ -7,6 +7,13 @@
             </router-link>
         </li>
         <li>
+            <router-link to="marcador">
+                <i class="fas fa-user-tag"></i>
+                <!-- <i class="material-icons">airplay</i> -->
+                <p>Marcador</p>
+            </router-link>
+        </li>
+        <li>
             <router-link to="tareo">
                 <i class="fas fa-user-tag"></i>
                 <!-- <i class="material-icons">airplay</i> -->

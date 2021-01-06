@@ -20,6 +20,7 @@ export default {
          */
         db.transaction((tx)=>{
             tx.executeSql('CREATE TABLE IF NOT EXISTS ASISTENCIA(codigo_operador,nom_operador,fecha_ref,fundo_id)');
+            tx.executeSql('CREATE TABLE IF NOT EXISTS MARCAS(codigo_operador,fecha,fundo_id)');
             tx.executeSql('CREATE TABLE IF NOT EXISTS TAREO (codigo_operador,proceso_id,labor_id,area_id,fecha,fundo_id,enviado,cuenta_id)');
             tx.executeSql('CREATE TABLE IF NOT EXISTS AREA (id, nom_area)');
             tx.executeSql('CREATE TABLE IF NOT EXISTS LABOR (id, nom_labor,area_id)');
