@@ -1,22 +1,26 @@
 <template>
-    <div class="container">
+    <div class="">
         <div class="login">
-            <div class="row">
-                <div class="col-lg-4 col-sm-6 text-center">
-                    <img src="img/logo.png" alt="" style="width:100px">
-                </div>
-                <div class="col-lg-4 col-sm-6">
-                    <div class="card card-login my-3">
-                        <div class="card-body">
-                            <form v-on:submit.prevent="seleccionarFundo">
-                                <Input title="Usuario" v-model="cuenta.usuario"></Input>
-                                <Input title="Contraseña" type="password" v-model="cuenta.password"></Input>
-                                <div class="text-center">
-                                    <button type="submit" class="btn btn-primary">
-                                        Ingresar
-                                    </button>  
-                                </div>
-                            </form>
+            <div class="bg-login">
+                <img src="img/logo-blanco.png" alt="">
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4 col-sm-6">
+                        <div class="card card-login my-3">
+                            <div class="card-body">
+                                <h4 class="text-center">Tareo Movil</h4>
+                                <br>
+                                <form v-on:submit.prevent="seleccionarFundo">
+                                    <Input title="USUARIO" v-model="cuenta.usuario"></Input>
+                                    <Input title="CONTRASEÑA" type="password" v-model="cuenta.password"></Input>
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-success">
+                                            Ingresar
+                                        </button>  
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>

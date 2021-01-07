@@ -23,11 +23,20 @@
         <div class="col-sm-6">
              <div class="card">
                  <div class="card-header">
-                    <h5 class="card-title">Enviar Datos</h5>
+                    <h5 class="card-title">Marcas</h5>
                  </div>
                  <div class="card-body">
-                    <button @click="enviarTareos" class="btn btn-success">Tareo</button>
-                    <button @click="enviarMarcas" class="btn btn-success">Marcas</button>
+                    <button @click="enviarMarcas" class="btn btn-success">Enviar</button>
+                 </div>
+             </div>
+        </div>
+        <div class="col-sm-6">
+             <div class="card">
+                 <div class="card-header">
+                    <h5 class="card-title">Tareos</h5>
+                 </div>
+                 <div class="card-body">
+                    <button @click="enviarTareos" class="btn btn-success">Enviar</button>
                  </div>
              </div>
         </div>
@@ -137,18 +146,25 @@ export default {
             var t=this;
             db.transaction((tx)=>{
                 tx.executeSql('SELECT TAREO.*,rowid FROM TAREO WHERE enviado="NO"', [], function (tx, results) {
-                    t.listaTareo=[];
-                    for (let i = 0; i < results.rows.length; i++) {
-                        t.listaTareo.push(results.rows.item(i));
-                    }
-                    axios.post(url_base+'/sincronizar/tareo',{data: t.listaTareo})
+                    axios.post(url_base+'/sincronizar/tareo',{data: results.rows})
                     .then(response => {
                         var respuesta=response.data;
-                        db.transaction((tx)=>{
-                            tx.executeSql('UPDATE TAREO SET ENVIADO="SI" WHERE rowid in ('+respuesta.data.join()+')',[],function (tx, results) {
-                                swal("", respuesta.data.length+" Tareos sincronizados.", "success"); 
+                        if (respuesta.status=="OK") {
+                            db.transaction((tx)=>{
+                                tx.executeSql('DELETE FROM TAREO');
+                                swal({
+                                    text: "TAREO SINCRONIZADO",
+                                    icon: "success",
+                                });
                             });
-                        });
+                        }
+                        // db.transaction((tx)=>{
+                        //     tx.executeSql('UPDATE TAREO SET ENVIADO="SI" WHERE rowid in ('+respuesta.data.join()+')',[],function (tx, results) {
+                        //         swal("", respuesta.data.length+" Tareos sincronizados.", "success"); 
+                        //     });
+
+
+                        // });
                     }).catch(function(err) {
                         swal("", 'Error de conexión ' + err, "error");
                     });
@@ -163,15 +179,16 @@ export default {
                     // console.log(results.rows);
                     axios.post(url_base+'/sincronizar/in/marcas',{data: results.rows})
                     .then(response => {
-                        db.transaction((tx)=>{
-                            tx.executeSql('DELETE FROM MARCAS');
-                            swal({
-                                title: "Good job!",
-                                text: "You clicked the button!",
-                                icon: "success",
-                            });
-
-                        });  
+                        var res=response.data;
+                        if (res.status=='OK') {
+                            db.transaction((tx)=>{
+                                tx.executeSql('DELETE FROM MARCAS');
+                                swal({
+                                    text: "MARCADOR SINCRONIZADO",
+                                    icon: "success",
+                                });
+                            });  
+                        }
                     });
                 });
             });
