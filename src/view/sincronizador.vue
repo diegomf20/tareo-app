@@ -3,54 +3,35 @@
         <div class="col-sm-6">
              <div class="card">
                  <div class="card-header">
-                    <h5 class="card-title">Recibir Datos</h5>
+                    <h5 class="card-title text-center">Recibir Datos</h5>
                  </div>
                  <div class="card-body">
                      <button @click="recibirDatos" class="btn btn-success">Centro de Costos / Actividad / Labor</button>
                  </div>
              </div>
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-6 col-6">
              <div class="card">
                  <div class="card-header">
-                    <h5 class="card-title">Recibir Asistencia</h5>
+                    <h5 class="card-title text-center">Marcas</h5>
                  </div>
-                 <div class="card-body">
-                     <button @click="recibirAsistencia" class="btn btn-success">Asistencias</button>
-                 </div>
-             </div>
-        </div>
-        <div class="col-sm-6">
-             <div class="card">
-                 <div class="card-header">
-                    <h5 class="card-title">Marcas</h5>
-                 </div>
-                 <div class="card-body">
+                 <div class="card-body text-center">
+                    <p>{{ marcas }} sincronizables</p>
                     <button @click="enviarMarcas" class="btn btn-success">Enviar</button>
                  </div>
              </div>
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-6 col-6">
              <div class="card">
                  <div class="card-header">
-                    <h5 class="card-title">Tareos</h5>
+                    <h5 class="card-title text-center">Tareos</h5>
                  </div>
-                 <div class="card-body">
+                 <div class="card-body text-center">
+                    <p>{{ tareos }} sincronizables</p>
                     <button @click="enviarTareos" class="btn btn-success">Enviar</button>
                  </div>
              </div>
-        </div>
-        <div class="col-sm-6">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title">Limpiar Datos</h5>
-                </div>
-                <div class="card-body">
-                    <button @click="limpiar" class="btn btn-success">Datos ya enviados</button>
-                </div>
-            </div>
-        </div>
-        
+        </div>        
     </div>
 </template>
 <script>
@@ -60,13 +41,31 @@ export default {
     data() {
         return {
             listaTareo: [],
-            listaMarcador: []
+            listaMarcador: [],
+            tareos: 0,
+            marcas: 0,
         }
     },
     computed: {
         ...mapState(['cuenta']),
     },
+    mounted() {
+        this.resumen();
+    },
     methods: {
+        resumen(){
+            var t=this;
+            db.transaction((tx)=>{
+                tx.executeSql('SELECT COUNT(*) cantidad FROM TAREO', [], function (tx, results) {
+                    t.tareos=results.rows.item(0).cantidad
+                },errorCB);
+            });    
+            db.transaction((tx)=>{
+                tx.executeSql('SELECT COUNT(*) cantidad FROM MARCAS', [], function (tx, results) {
+                    t.marcas=results.rows.item(0).cantidad
+                },errorCB);
+            });    
+        },
         recibirAsistencia(){
             axios.get(url_base+'/sincronizar/asistencia?fecha='+moment().format('YYYY-MM-DD')+'&fundo_id='+this.cuenta.fundo_id)
             .then(response => {
@@ -156,15 +155,9 @@ export default {
                                     text: "TAREO SINCRONIZADO",
                                     icon: "success",
                                 });
+                                t.resumen();
                             });
                         }
-                        // db.transaction((tx)=>{
-                        //     tx.executeSql('UPDATE TAREO SET ENVIADO="SI" WHERE rowid in ('+respuesta.data.join()+')',[],function (tx, results) {
-                        //         swal("", respuesta.data.length+" Tareos sincronizados.", "success"); 
-                        //     });
-
-
-                        // });
                     }).catch(function(err) {
                         swal("", 'Error de conexión ' + err, "error");
                     });
@@ -187,18 +180,12 @@ export default {
                                     text: "MARCADOR SINCRONIZADO",
                                     icon: "success",
                                 });
+                                t.resumen();
                             });  
                         }
                     });
                 });
             });
-        },
-        limpiar(){
-            db.transaction((tx)=>{
-                tx.executeSql('DELETE FROM TAREO WHERE enviado="SI" AND fecha<=datetime("now","-2 day")', [], function (tx, results) {
-                    swal("", 'Datos Antiguos Eliminados.', "info");
-                },errorCB);
-            });    
         }
     },
 }

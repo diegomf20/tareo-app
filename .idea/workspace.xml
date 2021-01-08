@@ -2,16 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b495c961-6d28-43f7-b976-49adf0582e1a" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/tareo-app.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/tareo-app.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/platforms/android/android.json" beforeDir="false" afterPath="$PROJECT_DIR$/platforms/android/android.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platforms/android/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/platforms/android/app/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/platforms/android/settings.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/platforms/android/settings.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/layouts/panel.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/layouts/panel.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/layouts/parts/comun.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/layouts/parts/comun.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/view/login.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/login.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/view/marcador.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/marcador.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/view/sincronizador.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/sincronizador.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/view/tareo.vue" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/tareo.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/www/css/dragon-desing.css" beforeDir="false" afterPath="$PROJECT_DIR$/www/css/dragon-desing.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/www/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/www/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/www/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/www/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/www/js/app.js.map" beforeDir="false" afterPath="$PROJECT_DIR$/www/js/app.js.map" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,22 +108,22 @@
       <screen x="0" y="0" width="1366" height="728" />
     </state>
     <state x="110" y="120" width="1146" height="488" key="AVDManager/0.0.1366.728@0.0.1366.728" timestamp="1610028123507" />
-    <state width="1286" height="162" key="GridCell.Tab.0.bottom" timestamp="1610058066100">
+    <state width="1323" height="177" key="GridCell.Tab.0.bottom" timestamp="1610149084375">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1286" height="162" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1610058066100" />
-    <state width="1286" height="162" key="GridCell.Tab.0.center" timestamp="1610058066100">
+    <state width="1323" height="177" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1610149084375" />
+    <state width="1323" height="177" key="GridCell.Tab.0.center" timestamp="1610149084375">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1286" height="162" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1610058066100" />
-    <state width="1286" height="162" key="GridCell.Tab.0.left" timestamp="1610058066100">
+    <state width="1323" height="177" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1610149084375" />
+    <state width="1323" height="177" key="GridCell.Tab.0.left" timestamp="1610149084374">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1286" height="162" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1610058066100" />
-    <state width="1286" height="162" key="GridCell.Tab.0.right" timestamp="1610058066100">
+    <state width="1323" height="177" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1610149084374" />
+    <state width="1323" height="177" key="GridCell.Tab.0.right" timestamp="1610149084375">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state width="1286" height="162" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1610058066100" />
+    <state width="1323" height="177" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1610149084375" />
     <state x="184" y="9" key="SettingsEditor" timestamp="1610029775101">
       <screen x="0" y="0" width="1366" height="728" />
     </state>

@@ -15,11 +15,12 @@
         </div>
         <div class="background-sidebar" @click="close()"></div>
         <nav class="navbar" v-if="cuenta!=null">
-            <a @click="open()">
+            <a class="navbar-button" @click="open()">
                 <i class="fas fa-bars"></i>
             </a>
-            <h5 >{{ cuenta.fundo_id }}</h5>
-            
+            <div class="container-fluid">
+                <h5 class="text-center mb-0">{{ `${cuenta.fundo_id} - ${title}` }}</h5>
+            </div>
         </nav>
         <div class="content">
             <slot/>
@@ -34,7 +35,10 @@ export default {
     components:{
         comun
     },
-    computed: {
+    computed:{
+        title(){
+            return this.$route.meta.title;
+        },
         ...mapState(['cuenta']),
         ...mapState('sidebar',['statusSidebar']),
     },

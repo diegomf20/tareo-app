@@ -1,14 +1,8 @@
 <template>
     <ul>
         <li>
-            <router-link to="home">
-                <i class="fab fa-algolia"></i>
-                <p>home</p>
-            </router-link>
-        </li>
-        <li>
             <router-link to="marcador">
-                <i class="fas fa-user-tag"></i>
+                <i class="fab fa-algolia"></i>
                 <!-- <i class="material-icons">airplay</i> -->
                 <p>Marcador</p>
             </router-link>

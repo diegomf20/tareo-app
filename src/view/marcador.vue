@@ -2,9 +2,6 @@
     <div class="row">
         <div class="col-sm-6">
              <div class="card">
-                 <div class="card-header">
-                    <h4 class="card-title">Registro de Marcación</h4>
-                </div>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-12">
@@ -13,23 +10,15 @@
                                 <Input title="Codigo de Barras" type="number" :focusSelect="status_focus" v-model="codigo_barras"></Input>
                                 <button type="submit" hidden></button>
                             </form>
+                            <div v-if="alert!=null" :class="'alert alert-'+alert.status" role="alert">
+                                {{ alert.data }}
+                            </div>
                         </div>
                     </div>
                 </div>
              </div>
         </div>
-        <div class="col-sm-6">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="card-title">Respuesta</h4>
-                </div>
-                <div class="card-body">
-                    <div v-if="alert!=null" :class="'alert alert-'+alert.status" role="alert">
-                        {{ alert.data }}
-                    </div>
-                </div>
-            </div>
-        </div>
+        
     </div>
 </template>
 <script>

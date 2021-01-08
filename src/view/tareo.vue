@@ -31,10 +31,11 @@
                 </div>
             </div>
              <div class="card">
-                 <div class="card-header">
-                    <h4 class="card-title text-center" v-if="isMovil">TAREO MOVIL <button class="btn btn-danger btn-sm btn-float-right" @click="openPendientes()">P</button></h4>
+                 <!-- <div class="card-header">
+                    <h4 class="card-title text-center" v-if="isMovil">TAREO MOVIL 
+                    </h4>
                     <h4 class="card-title text-center" v-else>TAREO <button class="btn btn-danger btn-sm btn-float-right" @click="openPendientes()">P</button></h4>
-                </div>
+                </div> -->
                 <div class="card-body">
                     <h5 class="mb-3">Fecha: {{ this.fecha }}</h5>
                     <Select title="Centro de Costo:" v-model="tareo.proceso_id">
@@ -53,18 +54,18 @@
                         <Input title="Codigo de Barras" :focusSelect='focus' type="number" v-model="tareo.codigo_barras"></Input>
                         <button type="submit" hidden></button>
                     </form>
+                    <div v-if="alert!=null" :class="'alert alert-'+alert.status" role="alert">
+                        {{ alert.data }}
+                    </div>
                 </div>
              </div>
         </div>
         <div class="col-sm-6">
             <div class="card">
-                <div class="card-header">
+                <!-- <div class="card-header">
                     <h4 class="card-title">Respuesta</h4>
-                </div>
+                </div> -->
                 <div class="card-body">
-                    <div v-if="alert!=null" :class="'alert alert-'+alert.status" role="alert">
-                        {{ alert.data }}
-                    </div>
                     <div v-if="respuesta!=null && respuesta.status=='OK'"  class="fotocheck text-center" style="margin-right: auto;margin-left: auto">
                         <img :src="url(respuesta.data.foto)" alt="">
                         <p><b>{{ respuesta.data.nom_operador.split(' ')[0] }} {{ respuesta.data.ape_operador.split(' ')[0] }}</b></p>
@@ -196,6 +197,7 @@ export default {
                             },errorCB, successCB);
                         }, errorCB, successCB);
                     }else{
+                        this.tareo.codigo_barras=null;
                         t.alert={
                             status: 'danger',
                             data: 'Campos Vacios.'

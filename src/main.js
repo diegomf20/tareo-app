@@ -81,12 +81,18 @@ var routes =[
   {
     path: '/marcador',
     component: require('./view/marcador.vue').default,
-    beforeEnter: auth  
+    beforeEnter: auth,
+    meta:{
+      title: "Marcador",
+    },  
   },
   {
     path: '/tareo',
     component: require('./view/tareo.vue').default,
-    beforeEnter: auth  
+    beforeEnter: auth,  
+    meta:{
+      title: "Tareo",
+    },
   },
   {
     path: '/home',
@@ -96,11 +102,14 @@ var routes =[
   {
     path: '/sincronizador',
     component: require('./view/sincronizador.vue').default,
-    beforeEnter: auth  
+    beforeEnter: auth , 
+    meta:{
+      title: "Sincronizador",
+    },
   },
   {
     path: '/',
-    redirect: '/tareo'
+    redirect: '/marcador',
   },
   { 
     path: '/login', 
