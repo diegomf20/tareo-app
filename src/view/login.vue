@@ -68,7 +68,7 @@ export default {
                 password: null
             },
             fundos:[],
-            fundo_id: null,
+            fundo_id: '',
             cuenta_logeada: null
         }
     },
@@ -81,15 +81,17 @@ export default {
             .then(response => {
                 var respuesta=response.data;
                 this.fundos=respuesta;
-                if (this.fundos.length>0) {
-                    this.fundo_id=this.fundos[0].id;
-                }
+
             });
         },
         ingresar(){
-            this.cuenta_logeada.fundo_id=this.fundo_id;
-            this.$store.commit('auth_success', this.cuenta_logeada);
-            this.$router.push({path: "/"} );
+            if (this.fundo_id=='') {
+                swal("","Seleccionar un Fundo" , 'warning');
+            }else{
+                this.cuenta_logeada.fundo_id=this.fundo_id;
+                this.$store.commit('auth_success', this.cuenta_logeada);
+                this.$router.push({path: "/"} );
+            }
         },
         seleccionarFundo(){
             axios.post(url_base+'/login?fundo_id='+this.fundo_id,this.cuenta)
@@ -105,9 +107,9 @@ export default {
                         axios.get(url_base+'/privilegios',{ headers: {"Authorization" : `${this.cuenta_logeada.api_token}`} })
                         .then(response => {
                             this.fundos=response.data;
-                            if (this.fundos.length>0) {
-                                this.fundo_id=this.fundos[0].id;
-                            }
+                            // if (this.fundos.length>0) {
+                            //     this.fundo_id=this.fundos[0].id;
+                            // }
                         });
                         $('#modal-fundos').modal();
                         break;

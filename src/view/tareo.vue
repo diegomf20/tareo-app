@@ -31,17 +31,13 @@
                 </div>
             </div>
              <div class="card">
-                 <!-- <div class="card-header">
-                    <h4 class="card-title text-center" v-if="isMovil">TAREO MOVIL 
-                    </h4>
-                    <h4 class="card-title text-center" v-else>TAREO <button class="btn btn-danger btn-sm btn-float-right" @click="openPendientes()">P</button></h4>
-                </div> -->
                 <div class="card-body">
                     <h5 class="mb-3">Fecha: {{ this.fecha }}</h5>
                     <Select title="Centro de Costo:" v-model="tareo.proceso_id">
                         <option value="">--SELECCIONAR C.COSTO--</option>
                         <option v-for="proceso in procesos" :value="proceso.id">{{ proceso.id+" - "+ proceso.nom_proceso }}</option>
                     </Select>
+
                     <Select title="Actividad:" v-model="tareo.area_id">
                         <option value="">--SELECCIONAR ACTIVIDAD--</option>
                         <option v-for="area in areas" :value="area.id">{{ area.nom_area }}</option>
@@ -50,6 +46,16 @@
                         <option value="">--SELECCIONAR LABOR--</option>
                         <option v-for="labor in labores" :value="labor.id">{{ labor.nom_labor }}</option>
                     </Select>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="">Labores</label>
+                                <select v-model="tareo.labor_id" class="form-control">
+                                    <option v-for="labor in labores" :value="labor.id">{{ labor.nom_labor}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <form v-on:submit.prevent="guardar()">
                         <Input title="Codigo de Barras" :focusSelect='focus' type="number" v-model="tareo.codigo_barras"></Input>
                         <button type="submit" hidden></button>
@@ -75,8 +81,53 @@
                 </div>
             </div>
         </div>
+        <div id="modal-labor" class="modal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="row mb-3">
+                            <div class="col-8">
+                                <h6 class="modal-title">Buscar Labor</h6>
+                            </div>
+                            <div class="col-4">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    x
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-8"><Input title="Search" v-model="input_labor"></Input></div>
+                            <div class="col-4"><button @click="searchLabor()" class="btn btn-primary">Buscar</button></div>
+                        </div>
+                        <select class="form-control mb-3" v-model="index_select">
+                            <option v-for="(labor,i) in laborSearch" :key="i" :value="i">
+                                {{ `${labor.area_id} - ${labor.labor_id} - ${labor.nom_labor}`}}
+                            </option>
+                        </select>
+                        <div class="text-center">
+                            <button @click="selectLabor()" type="submit" class="btn btn-success">
+                                Continuar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
+<style>
+.form-group{
+    position: relative;
+}
+.form-group label{
+    position: absolute;
+    left: 12px;
+    top: 5px;
+}
+.form-control{
+    height: 40px;
+}
+</style>
 <script>
 import { mapState,mapMutations } from 'vuex'
 
@@ -103,36 +154,93 @@ export default {
             turnos:[],
             lineas:[],
             areas:[],
+            labores: [],
             procesos:[],
             /**Estado de registro */
             respuesta: null,
             alert: null,
             /**Lista de Pendientes */
             reporte:[],
-            areasLabor:[]
+            areasLabor:[],
+            laborSearch: [],
+
+            index_select: -1,
+
+
+            input_labor: ''
         }
     },
     mounted() {
-        
+        $('#modal-labor').modal();
         this.listarProcesos();
-        this.listarAreasLabor();        
+        this.listarAreasLabor();    
+        // this.searchLabor();    
+    },
+    watch: {
+        'tareo.area_id'(newValue,oldValue){
+            console.warn(newValue);
+            this.labores=[];
+            for (let i = 0; i < this.areas.length; i++) {
+                const area = this.areas[i];
+                if (area.id==newValue) {
+                    if (this.index_select==-1) {
+                        this.tareo.labor_id=null;
+                    }
+                    this.labores=area.labores;
+                }
+            }
+        }
     },
     computed: {
         ...mapState(['cuenta']),
-        labores(){
-            for (let i = 0; i < this.areas.length; i++) {
-                const area = this.areas[i];
-                if (area.id==this.tareo.area_id) {
-                    this.tareo.labor_id=null;
-                    return area.labores;
-                }
-            }
-            return [];
-        }
+        // labores(){
+        //     for (let i = 0; i < this.areas.length; i++) {
+        //         const area = this.areas[i];
+        //         if (area.id==this.tareo.area_id) {
+        //             if (this.index_select==-1) {
+        //                 this.tareo.labor_id=null;
+        //             }
+        //             return area.labores;
+        //         }
+        //     }
+        //     return [];
+        // }
     },
     methods: {
         url(foto){
             return url_base+'/../storage/operador/'+foto;
+        },
+        searchLabor(){
+            console.info("Ingreso a Seach Labor.")
+            db.transaction((tx)=>{
+                tx.executeSql(
+                    `SELECT LA.id as labor_id,
+                            area_id,
+                            nom_labor,
+                            nom_area 
+                    FROM labor as LA 
+                    INNER JOIN area as AR ON LA.area_id=AR.id
+                    WHERE LA.nom_labor LIKE '%${this.input_labor}%'`,
+                    [],
+                    (tx, results) =>{
+                        console.warn('sql');
+                        var labor_actividades=[];
+                        for (let j = 0; j < results.rows.length; j++) {
+                            labor_actividades.push(results.rows.item(j));
+                        }
+                        this.laborSearch=labor_actividades;
+                    }
+                ,function (error) {
+                    console.log(error);
+                })
+            });
+        },
+        selectLabor(){
+            var labor=this.laborSearch[this.index_select];
+            console.log(labor);
+            this.tareo.labor_id=labor.labor_id;
+            this.tareo.area_id=labor.area_id;
+            $('#modal-labor').modal('hide');
         },
         listarAreasLabor(){
             var t=this;
