@@ -37,22 +37,28 @@
                         <option value="">--SELECCIONAR C.COSTO--</option>
                         <option v-for="proceso in procesos" :value="proceso.id">{{ proceso.id+" - "+ proceso.nom_proceso }}</option>
                     </Select>
-
-                    <Select title="Actividad:" v-model="tareo.area_id">
-                        <option value="">--SELECCIONAR ACTIVIDAD--</option>
-                        <option v-for="area in areas" :value="area.id">{{ area.nom_area }}</option>
-                    </Select>
-                    <Select title="Labor:" v-model="tareo.labor_id">
-                        <option value="">--SELECCIONAR LABOR--</option>
-                        <option v-for="labor in labores" :value="labor.id">{{ labor.nom_labor }}</option>
-                    </Select>
                     <div class="row">
                         <div class="col-12">
+                            <div class="form-group">
+                                <label for="">Actividad</label>
+                                <select v-model="tareo.area_id" class="form-control">
+                                    <option v-for="area in areas" :value="area.id">{{ area.nom_area }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-9">
                             <div class="form-group">
                                 <label for="">Labores</label>
                                 <select v-model="tareo.labor_id" class="form-control">
                                     <option v-for="labor in labores" :value="labor.id">{{ labor.nom_labor}}</option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <button @click="openSearch()" type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -68,15 +74,11 @@
         </div>
         <div class="col-sm-6">
             <div class="card">
-                <!-- <div class="card-header">
-                    <h4 class="card-title">Respuesta</h4>
-                </div> -->
                 <div class="card-body">
                     <div v-if="respuesta!=null && respuesta.status=='OK'"  class="fotocheck text-center" style="margin-right: auto;margin-left: auto">
                         <img :src="url(respuesta.data.foto)" alt="">
                         <p><b>{{ respuesta.data.nom_operador.split(' ')[0] }} {{ respuesta.data.ape_operador.split(' ')[0] }}</b></p>
                         <hr>
-                        <h6>Jayanca Fruits</h6>
                     </div>
                 </div>
             </div>
@@ -119,14 +121,25 @@
 .form-group{
     position: relative;
 }
-.form-group label{
+.form-group>label{
     position: absolute;
-    left: 12px;
-    top: 5px;
+    left: 16px;
+    top: 2px;
+    font-size: 8px;
+    font-weight: 500;
 }
 .form-control{
+    border: 1px solid #c2c2c2;
     height: 40px;
+    font-size: 0.90rem;
+    font-weight: 500;
+
 }
+.form-control:focus{
+    border: 2px solid var(--success-color);
+    box-shadow: none;
+}
+
 </style>
 <script>
 import { mapState,mapMutations } from 'vuex'
@@ -171,10 +184,8 @@ export default {
         }
     },
     mounted() {
-        $('#modal-labor').modal();
         this.listarProcesos();
         this.listarAreasLabor();    
-        // this.searchLabor();    
     },
     watch: {
         'tareo.area_id'(newValue,oldValue){
@@ -193,22 +204,13 @@ export default {
     },
     computed: {
         ...mapState(['cuenta']),
-        // labores(){
-        //     for (let i = 0; i < this.areas.length; i++) {
-        //         const area = this.areas[i];
-        //         if (area.id==this.tareo.area_id) {
-        //             if (this.index_select==-1) {
-        //                 this.tareo.labor_id=null;
-        //             }
-        //             return area.labores;
-        //         }
-        //     }
-        //     return [];
-        // }
     },
     methods: {
         url(foto){
             return url_base+'/../storage/operador/'+foto;
+        },
+        openSearch(){
+            $('#modal-labor').modal();
         },
         searchLabor(){
             console.info("Ingreso a Seach Labor.")
@@ -223,12 +225,12 @@ export default {
                     WHERE LA.nom_labor LIKE '%${this.input_labor}%'`,
                     [],
                     (tx, results) =>{
-                        console.warn('sql');
                         var labor_actividades=[];
                         for (let j = 0; j < results.rows.length; j++) {
                             labor_actividades.push(results.rows.item(j));
                         }
                         this.laborSearch=labor_actividades;
+                        this.index_select=0;
                     }
                 ,function (error) {
                     console.log(error);
@@ -277,47 +279,42 @@ export default {
         },
         guardar(){
             this.$nextTick(() =>{
-                var t=this;
                 if (((null==this.tareo.codigo_barras) ? '' : this.tareo.codigo_barras ).length==8) {
-                    if (t.tareo.codigo_barras!=null&&t.tareo.proceso_id!=null&&t.tareo.labor_id!=null&&t.tareo.area_id!=null) {
+                    if (this.tareo.codigo_barras!=null&&this.tareo.proceso_id!=null&&this.tareo.labor_id!=null&&this.tareo.area_id!=null) {
                         db.transaction((tx)=>{
                             var query='SELECT * FROM ASISTENCIA WHERE fecha_ref=? AND codigo_operador=?';
-                            tx.executeSql( query, [ moment().format('YYYY-MM-DD'),t.tareo.codigo_barras], 
-                            function (tx, results) {
-                                var message="";
-                                // console.log(results)
-                                // console.log(results.rows.length);
-                                
-                                if (results.rows.length>0) {
-                                    message="Tareo Correcto: ("+results.rows.item(0).nom_operador+")";
-                                }else{
-                                    message="Tareo sin asistencia";
-                                }
+                            var parametros=[moment().format('YYYY-MM-DD'),this.tareo.codigo_barras]
+                            tx.executeSql( query, parametros, 
+                            (tx, results) =>{
+                                var message= (results.rows.length>0) ? "Tareo Correcto: ("+results.rows.item(0).nom_operador+")" : `Tareo sin asistencia: (${this.tareo.codigo_barras})`;
                                 
                                 tx.executeSql('INSERT INTO TAREO(codigo_operador,proceso_id,labor_id,area_id,fecha,fundo_id,enviado,cuenta_id) VALUES (?,?,?,?,?,?,"NO",?)',
-                                [t.tareo.codigo_barras,t.tareo.proceso_id,t.tareo.labor_id,t.tareo.area_id,moment().format('YYYY-MM-DD'),t.cuenta.fundo_id,t.cuenta.id],()=>{
-                                    t.tareo.codigo_barras=null;
-                                    t.alert={
-                                        status: 'success',
-                                        data: message
-                                    }
+                                [
+                                    this.tareo.codigo_barras,
+                                    this.tareo.proceso_id,
+                                    this.tareo.labor_id,
+                                    this.tareo.area_id,
+                                    moment().format('YYYY-MM-DD'),
+                                    this.cuenta.fundo_id,
+                                    this.cuenta.id
+                                ],()=>{
+                                    navigator.vibrate([500,100,500]);
+                                    this.tareo.codigo_barras=null;
+                                    this.showAlerta('success',message);
                                 },errorCB);              
                             },errorCB, successCB);
                         }, errorCB, successCB);
                     }else{
                         this.tareo.codigo_barras=null;
-                        t.alert={
+                        this.alert={
                             status: 'danger',
                             data: 'Campos Vacios.'
                         }
-
+                        this.showAlerta('danger','Campos Vacios.');
                     }
                 }else{
                     this.tareo.codigo_barras=null;
-                    this.alert={
-                        status: 'danger',
-                        data: 'Código no Valido'
-                    }
+                    this.showAlerta('danger','Código no Valido');
                 }
             })
         },
@@ -331,7 +328,6 @@ export default {
                         +'ON A.codigo_operador=T.codigo_operador '+
                         'WHERE T.labor_id is NULL AND '
                         +'A.fundo_id="'+t.cuenta.fundo_id+'" AND A.fecha_ref=? '+'GROUP BY A.codigo_operador,A.nom_operador';
-                console.log(query);
                 tx.executeSql(
                     query, 
                 [
@@ -345,6 +341,18 @@ export default {
                 },errorCB, successCB);
             }, errorCB, successCB);
             $('#modal-pendientes').modal();
+        },
+        showAlerta(status,data){
+            this.alert={
+                status: status,
+                data: data
+            }
+            setTimeout(() => {
+                this.alert={
+                    status: null,
+                    data: null
+                }
+            }, 500);
         }
     },
 }

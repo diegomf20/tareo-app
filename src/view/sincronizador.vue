@@ -5,8 +5,10 @@
                  <div class="card-header">
                     <h5 class="card-title text-center">Recibir Datos</h5>
                  </div>
-                 <div class="card-body">
-                     <button @click="recibirDatos" class="btn btn-success">Centro de Costos / Actividad / Labor</button>
+                 <div class="card-body text-center">
+                     <button @click="recibirDatos" class="btn btn-success mb-3">Centro de Costos / Actividad / Labor</button>
+                     <br>
+                     <button @click="recibirAsistencia" class="btn btn-success">Asistencia {{fecha}}</button>
                  </div>
              </div>
         </div>
@@ -44,6 +46,7 @@ export default {
             listaMarcador: [],
             tareos: 0,
             marcas: 0,
+            fecha: moment().format('YYYY-MM-DD')
         }
     },
     computed: {
@@ -67,7 +70,7 @@ export default {
             });    
         },
         recibirAsistencia(){
-            axios.get(url_base+'/sincronizar/asistencia?fecha='+moment().format('YYYY-MM-DD')+'&fundo_id='+this.cuenta.fundo_id)
+            axios.get(url_base+'/sincronizar/asistencia?fecha='+this.fecha+'&fundo_id='+this.cuenta.fundo_id)
             .then(response => {
                 var asistencias = response.data;
                 console.log(asistencias);
