@@ -239,7 +239,6 @@ export default {
         },
         selectLabor(){
             var labor=this.laborSearch[this.index_select];
-            console.log(labor);
             this.tareo.labor_id=labor.labor_id;
             this.tareo.area_id=labor.area_id;
             $('#modal-labor').modal('hide');
@@ -352,7 +351,7 @@ export default {
                     status: null,
                     data: null
                 }
-            }, 500);
+            }, 1000);
         }
     },
 }

@@ -55,9 +55,7 @@ export default {
         pda(e) {
             const textInput = e.key || String.fromCharCode(e.keyCode);
             if (textInput=="Enter"&&this.barcode!="") {
-                // console.log(this.barcode);
                 this.guardar(this.barcode);
-                // alert(this.barcode);
                 this.barcode="";
             }else if (textInput!="Enter") {
                 this.barcode+=textInput;
@@ -87,84 +85,6 @@ export default {
                             t.marcaRegistrada();
                         });
                     });
-                    //     console.log(cod_barras_paso);
-                    //     /**
-                    //      * Comprobacion.
-                    //      */
-                    //     var fecha_consulta=(moment().format('HH')<moment().format('07')) ? moment().subtract(1,'day').format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
-                        
-                        
-                        
-
-                    //     tx.executeSql('SELECT rowid,*,datetime("now","-14 hour") FROM MARCADOR WHERE codigo_operador=? AND ingreso > ?  ORDER BY rowid DESC LIMIT 1', [cod_barras_paso,moment().subtract(15,'hour').format('YYYY-MM-DD')], function (tx, results) {
-
-                    //         var anterior_marca=null;
-                            
-                    //         for (let j = 0; j < results.rows.length; j++) {
-                    //             anterior_marca = results.rows.item(j);
-                    //             console.log(anterior_marca);
-                                
-                    //         }
-
-                    //         if (anterior_marca!=null) {
-                    //             // var fecha_limite = moment().subtract(1,'minutes');
-                                
-                    //             if(
-                    //                 (anterior_marca.salida==null&&moment().diff(anterior_marca.ingreso,'minutes')<1)
-                    //                 ||(anterior_marca.salida!=null&&moment().diff(anterior_marca.salida,'minutes')<1)) {
-                    //                 t.alert={
-                    //                     status: "warning",
-                    //                     data: "Usted Marco recientemente"
-                    //                 }
-                    //             }else{
-                    //                 var hora_fecha_actual=moment();
-                    //                 var hora_fecha_limite=moment().startOf('day').add(8,'hours');
-                    //                 var fecha_ayer=moment().subtract(1,'days').format('YYYY-MM-DD');
-                    //                 if (
-                    //                     anterior_marca==null||
-                    //                     anterior_marca.salida!=null||
-                    //                     (
-                    //                         anterior_marca.salida==null&&
-                    //                         fecha_ayer==moment(anterior_marca.ingreso).format('YYYY-MM-DD')&&
-                    //                         hora_fecha_actual>hora_fecha_limite
-                    //                     )
-                    //                 ) 
-                    //                 {
-                    //                     /**
-                    //                      * Agregar Marca
-                    //                      */
-                    //                     tx.executeSql('INSERT INTO MARCADOR (codigo_operador,ingreso,fecha_ref,fundo_id,enviado,cuenta_id) VALUES (?,?,?,?,"NO",?)',
-                    //                         [
-                    //                             cod_barras_paso,
-                    //                             moment().format('YYYY-MM-DD HH:mm'),
-                    //                             moment().format('YYYY-MM-DD'),
-                    //                             t.cuenta.fundo_id,
-                    //                             t.cuenta.id
-                    //                         ]
-                    //                     ,t.marcaRegistrada); 
-                    //                 }else{
-                    //                     /**
-                    //                      * Actualizar Marca
-                    //                      */
-                    //                     tx.executeSql('UPDATE MARCADOR SET salida="'+moment().format('YYYY-MM-DD HH:mm')+'" WHERE rowid=?',[anterior_marca.rowid],t.marcaRegistrada);
-                    //                 }
-                    //             }
-                    //         }else{
-                    //             tx.executeSql('INSERT INTO MARCADOR (codigo_operador,ingreso,fecha_ref,fundo_id,enviado,cuenta_id) VALUES (?,?,?,?,"NO",?)',
-                    //                 [
-                    //                     cod_barras_paso,
-                    //                     moment().format('YYYY-MM-DD HH:mm'),
-                    //                     moment().format('YYYY-MM-DD'),
-                    //                     t.cuenta.fundo_id,
-                    //                     t.cuenta.id
-                    //                 ],
-                    //             t.marcaRegistrada,
-                    //             errorCB
-                    //             );                                
-                    //         }
-
-                    //     });
-                    // });
                 }else{
                     this.codigo_barras=null;
                     this.alert={

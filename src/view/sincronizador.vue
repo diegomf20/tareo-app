@@ -72,9 +72,7 @@ export default {
         recibirAsistencia(){
             axios.get(url_base+'/sincronizar/asistencia?fecha='+this.fecha+'&fundo_id='+this.cuenta.fundo_id)
             .then(response => {
-                var asistencias = response.data;
-                console.log(asistencias);
-                
+                var asistencias = response.data;                
                 /**
                  * Limpiado y Guardado
                  */            
@@ -172,7 +170,6 @@ export default {
             var t=this;
             db.transaction((tx)=>{
                 tx.executeSql('SELECT *,rowid FROM MARCAS', [], function (tx, results) {
-                    // console.log(results.rows);
                     axios.post(url_base+'/sincronizar/in/marcas',{data: results.rows})
                     .then(response => {
                         var res=response.data;
